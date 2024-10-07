@@ -131,58 +131,27 @@ resource "aws_iam_role_policy_attachment" "glue_admin_role_glue_policy" {
 
 
 
-# #Glue job
-# resource "aws_glue_job" "etl_job" {
-#   name     = "fitness-health-etl"
-#   role_arn = aws_iam_role.glue_role.arn
+#Glue job
+resource "aws_glue_job" "etl_job" {
+  name     = "fitness-health-etl"
+  role_arn = aws_iam_role.glue_admin_role.arn
 
-#   command {
-#     name            = "glueetl"
-#     script_location = "s3://s3_mutiverse/scripts/etl_script.py"
-#     python_version  = "3"
-#   }
+  command {
+    name            = "glueetl"
+    script_location = "s3://s3-multiverse/scripts/etl_script.py"
+    python_version  = "3"
+  }
 
-#   default_arguments = {
-#     "--job-bookmark-option"  = "job-bookmark-enable"
-#     "--enable-metrics"       = "true"
-#     "--S3_BUCKET"            = aws_s3_bucket.s3_multiverse.bucket
-#     "--SOURCE_USERS_KEY"     = "data/users.csv"
-#     "--SOURCE_CALORIES_KEY"  = "data/calories_burned.csv"
-#     "--DESTINATION_KEY"      = "data/transformed/"
-#   }
+  default_arguments = {
+    "--job-bookmark-option"  = "job-bookmark-enable"
+    "--enable-metrics"       = "true"
+    "--S3_BUCKET"            = aws_s3_bucket.s3_multiverse.bucket
+    "--SOURCE_USERS_KEY"     = "data/users.csv"
+    "--SOURCE_CALORIES_KEY"  = "data/calories_burned.csv"
+    "--DESTINATION_KEY"      = "data/transformed/"
+  }
 
-#   max_retries  = 1
-#   timeout      = 20
-#   glue_version = "3.0"
-# }
-
-# # IAM Role for access
-# resource "aws_iam_role" "glue_role" {
-#   name = "glue_etl_role"
-
-#   assume_role_policy = jsonencode({
-#     Version = "2012-10-17",
-#     Statement = [{
-#       Action    = "sts:AssumeRole",
-#       Effect    = "Allow",
-#       Principal = {
-#         Service = "glue.amazonaws.com"
-#       }
-#     }]
-#   })
-
-#   inline_policy {
-#     name   = "s3-access"
-#     policy = jsonencode({
-#       Version = "2012-10-17",
-#       Statement = [{
-#         Effect   = "Allow",
-#         Action   = ["s3:GetObject", "s3:PutObject", "s3:ListBucket"],
-#         Resource = [
-#           aws_s3_bucket.s3_multiverse.arn,
-#           "${aws_s3_bucket.s3_multiverse.arn}/*"
-#         ]
-#       }]
-#     })
-#   }
-# }
+  max_retries  = 1
+  timeout      = 20
+  glue_version = "3.0"
+}
