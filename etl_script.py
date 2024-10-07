@@ -17,17 +17,17 @@ users_path = f"s3://{bucket}/{args['SOURCE_USERS_KEY']}"
 calories_path = f"s3://{bucket}/{args['SOURCE_CALORIES_KEY']}"
 destination_path = f"s3://{bucket}/{args['DESTINATION_KEY']}"
 
-# Extract Data from S3
+# Extract data from S3
 users_df = spark.read.option("header", "true").csv(users_path)
 calories_df = spark.read.option("header", "true").csv(calories_path)
 
-# Example Transform: Join Data on user_id
+# Join data on user_id
 joined_df = users_df.join(calories_df, "user_id")
 
-# Clean and Transform Data (example: drop missing values, convert types)
+# Transform Data
 transformed_df = joined_df.dropna().withColumn("calories_burned", col("calories_burned").cast("int"))
 
-# Load Transformed Data back to S3 as Parquet
+# Load Transformed Data back to S3
 transformed_df.write.mode("overwrite").parquet(destination_path)
 
 print("ETL job completed successfully.")
