@@ -155,3 +155,13 @@ resource "aws_glue_job" "etl_job" {
   timeout      = 20
   glue_version = "3.0"
 }
+
+#glue trigger
+resource "aws_glue_trigger" "health_fitness_trigger" {
+  name = "health-job"
+  type = "ON_DEMAND"
+
+  actions {
+    job_name = aws_glue_job.etl_job.name
+  }
+}
