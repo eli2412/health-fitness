@@ -11,11 +11,12 @@ glueContext = GlueContext(SparkContext.getOrCreate())
 spark = glueContext.spark_session
 
 # Get input arguments for S3 locations
-args = getResolvedOptions(sys.argv, ['S3_BUCKET', 'SOURCE_USERS_KEY', 'SOURCE_CALORIES_KEY', 'DESTINATION_KEY'])
+args = getResolvedOptions(sys.argv, ['S3_BUCKET', 'SOURCE_USERS_KEY', 'SOURCE_CALORIES_KEY', 'DESTINATION_KEY', 'DESTINATION_CSV_KEY'])
 bucket = args['S3_BUCKET']
 users_path = f"s3://{bucket}/{args['SOURCE_USERS_KEY']}"
 calories_path = f"s3://{bucket}/{args['SOURCE_CALORIES_KEY']}"
 destination_path = f"s3://{bucket}/{args['DESTINATION_KEY']}"
+destination_csv_path = f"s3://{bucket}/{args['DESTINATION_CSV_KEY']}"
 
 # Extract data from S3
 users_df = spark.read.option("header", "true").csv(users_path)
@@ -29,5 +30,7 @@ transformed_df = joined_df.dropna().withColumn("calories_burned", col("calories_
 
 # Load Transformed Data back to S3
 transformed_df.write.mode("overwrite").parquet(destination_path)
+transformed_df.write.mode("overwrite").option("header", "true").csv(destination_csv_path)
+
 
 print("ETL job completed successfully.")

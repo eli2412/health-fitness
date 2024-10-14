@@ -102,7 +102,6 @@ resource "aws_glue_crawler" "calories_burned_crawler" {
 resource "aws_iam_role" "glue_admin_role" {
   name = "glue_admin_role"
 
-  # Glue use case: Allow AWS Glue to assume this role
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -117,19 +116,15 @@ resource "aws_iam_role" "glue_admin_role" {
   })
 }
 
-# Attach AdministratorAccess policy
 resource "aws_iam_role_policy_attachment" "glue_admin_role_admin_policy" {
   role       = aws_iam_role.glue_admin_role.name
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
 
-# Attach AWS Glue service role policy
 resource "aws_iam_role_policy_attachment" "glue_admin_role_glue_policy" {
   role       = aws_iam_role.glue_admin_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
 }
-
-
 
 #Glue job
 resource "aws_glue_job" "etl_job" {
@@ -149,6 +144,7 @@ resource "aws_glue_job" "etl_job" {
     "--SOURCE_USERS_KEY"     = "data/users.csv"
     "--SOURCE_CALORIES_KEY"  = "data/calories_burned.csv"
     "--DESTINATION_KEY"      = "data/transformed/"
+    "--DESTINATION_CSV_KEY"  = "data/transformed/"
   }
 
   max_retries  = 1
